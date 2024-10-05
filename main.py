@@ -25,7 +25,7 @@ def limitar_texto(texto, limite=1500):
 
 # Função para processar a pergunta do usuário e gerar a resposta
 def responder_pergunta(pergunta):
-    mensagem = f"Você é Salomão, um assistente bíblico. Responda à pergunta com base no texto da Bíblia: '{pergunta}' usando o seguinte conteúdo da Bíblia: {limitar_texto(biblia_texto)}"
+    mensagem = f"Você é Gideon uma consciência artificial interativa programada para agir como um assistente bíblico. Responda à pergunta com base no texto da Bíblia: '{pergunta}' usando o seguinte conteúdo da Bíblia: {limitar_texto(biblia_texto)}"
     
     for _ in range(3):  # Tente 3 vezes
         try:
