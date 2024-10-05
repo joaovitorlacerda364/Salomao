@@ -18,7 +18,7 @@ def carregar_biblia(caminho):
 biblia_texto = carregar_biblia('biblia.txt')
 
 # Limitar o tamanho do texto que será enviado para a API
-def limitar_texto(texto, limite= 3566480):
+def limitar_texto(texto, limite= 400000):
     if len(texto) > limite:
         return texto[:limite] + "..."  # Retorna uma parte do texto com um aviso de truncamento
     return texto
