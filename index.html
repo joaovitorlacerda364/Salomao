@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salomão - Assistente Bíblico</title>
+    <style>
+     :root{
+        --dark: #0c0c0c;
+        --white: #fff;
+        --purple: #5959ff;
+        --gray: #949494;
+        --gray2: #cccccc;
+    }
+
+    body{
+      background-color: var(--dark);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--white);
+      display: flex;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .box-questions{
+      margin-top: 3rem;
+      background-color: var(--white);
+      color: var(--dark);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      max-height: 800px;
+      width: 600px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .header{
+      background-color: var(--purple);
+      color: var(--white);
+      border-radius: 10px 10px 0 0;
+      font-size: 1.4rem;
+    }
+
+    .footer{
+      background-color: var(--purple);
+      border-radius: 0 0 10px 10px;
+      padding: 1rem;
+    }
+
+    input{
+      width: 50%;
+      border: none;
+      outline: none;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+
+    button{
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 1rem;
+    }
+
+    button:hover{
+      cursor: pointer;
+      transition: .4s;
+      background-color: var(--gray);
+    }
+
+    #history{
+      padding: 1rem;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      height: 100%;
+    }
+
+    .box-my-message{
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .box-response-message{
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .my-message,
+    .response-message{
+      padding: 1rem;
+      border-radius: 10px;
+      color: white;
+      margin: 0;
+    }
+
+    .my-message{
+      text-align: right;
+      background-color: var(--gray);
+    }
+
+    .response-message{
+      text-align: left;
+      background-color: var(--gray2);
+    }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="box-questions">
+            <div class="header">
+              <p>Perguntas e respostas - Salomão</p>
+            </div>
+            <p id="status"></p>
+            <div id="history">
+              <!-- Aqui vai o chat gerado conforme as respostas -->
+            </div>
+            <div class="footer">
+              <input type="text" id="pergunta" placeholder="Pergunte aqui...">
+              <button class="btn-submit" id="btn-submit" onclick="sendMessage()">Enviar</button>
+            </div>
+          </div>
+    </div>
+    <script>
+        // Função para resetar o histórico ao carregar a página
+        window.onload = function() {
+            clearHistory(); // Chama a função para limpar o histórico
+        };
+
+        // Função que reseta o histórico
+        function clearHistory() {
+            document.getElementById('history').innerHTML = ''; // Limpa o conteúdo da div 'history'
+        }
+
+        // Função para enviar a pergunta e salvar no histórico
+        function sendMessage() {
+            let pergunta = document.getElementById('pergunta').value;
+
+            if (pergunta.trim() === '') {
+                return; // Não faz nada se o campo estiver vazio
+            }
+
+            console.log("Enviando pergunta:", pergunta); // Verifica a pergunta no console
+
+            // Adiciona a pergunta no histórico
+            let historyDiv = document.getElementById('history');
+            let userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'box-my-message';
+            userMessageDiv.innerHTML = `<p class="my-message">${pergunta}</p>`;
+            historyDiv.appendChild(userMessageDiv);
+
+            // Chamada AJAX para enviar a pergunta ao backend
+            fetch('https://salomao.onrender.com/perguntar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ pergunta: pergunta }) // Envia a pergunta
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na rede: ' + response.statusText); // Lança um erro se não for OK
+                }
+                return response.json(); // Converte a resposta para JSON
+            })
+            .then(data => {
+                console.log("Resposta recebida:", data); // Verifica a resposta no console
+
+                // Adiciona a resposta da IA no histórico
+                let responseMessageDiv = document.createElement('div');
+                responseMessageDiv.className = 'box-response-message';
+                responseMessageDiv.innerHTML = `<p class="response-message">${data.resposta}</p>`;
+                historyDiv.appendChild(responseMessageDiv);
+
+                // Limpa o campo de pergunta
+                document.getElementById('pergunta').value = '';
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+
+                // Mostra mensagem de erro no histórico
+                let errorMessageDiv = document.createElement('div');
+                errorMessageDiv.className = 'box-response-message';
+                errorMessageDiv.innerHTML = `<p class="response-message">Erro ao obter a resposta. Tente novamente mais tarde.</p>`;
+                historyDiv.appendChild(errorMessageDiv);
+            });
+        }
+    </script>
+</body>
+</html>
