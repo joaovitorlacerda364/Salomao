@@ -157,6 +157,16 @@ const API_URL = 'https://salomao.onrender.com/perguntar';
             e.preventDefault();
             handleOutgoingChat();
         });
+        const addToChatHistory = (pergunta, resposta) => {
+            const timestamp = new Date().toLocaleString();
+            const chatHTML = `<div class="chat"><p><strong>${pergunta}</strong><br>${resposta}<br><small>${timestamp}</small></p></div>`;
+            chatContainer.innerHTML += chatHTML;
+        
+            // Update localStorage
+            const savedChats = JSON.parse(localStorage.getItem("saved-chats")) || [];
+            savedChats.push({ pergunta, resposta, timestamp });
+            localStorage.setItem("saved-chats", JSON.stringify(savedChats));
+        };
 
         // Carregar dados do localStorage ao carregar a página
         loadDataFromLocalstorage();

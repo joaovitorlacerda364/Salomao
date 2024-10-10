@@ -1,61 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salomão Chatbot</title>
-    <!-- Linking Google Fonts For Icons -->
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
-    <link rel="stylesheet" href="styles.css">
+    <title>Salomão  - Login</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
-    <header class="header">
-        <!-- Header Greetings -->
-        <h1 class="title">Bem Vindo ao Salomão</h1>
-        <p class="subtitle">Seu Assistente Biblico, com o que posso te ajudar hoje?</p>
-
-        <!-- Suggestion list -->
-        <ul class="suggestion-list">
-            <li class="suggestion">
-                <h4 class="text">Como podemos entender a metáfora do "Bom Pastor" em João 10:11 e seu significado para os cristãos?                </h4>
-                <span class="icon material-symbols-rounded">explore</span>
-            </li>
-            <li class="suggestion">
-                <h4 class="text">Qual Livro Retrata a Criação do mundo?</h4>
-                <span class="icon material-symbols-rounded">explore</span>
-            </li>
-            <li class="suggestion">
-                <h4 class="text">Quem Foi Jesus?</h4>
-                <span class="icon material-symbols-rounded">explore</span>
-            </li>
-            <li class="suggestion">
-                <h4 class="text">Qual A Historia Contada em exodo?</h4>
-                <span class="icon material-symbols-rounded">explore</span>
-            </li>
-        </ul>
-    </header>
-
-    <!-- Chat List / Container -->
-    <div class="chat-list" id="history"></div>
-
-    <!-- Typing Area -->
-    <div class="typing-area">
-        <form action="#" class="typing-form">
-            <div class="input-wrapper">
-                <input id="pergunta" type="text" placeholder="Digite sua pergunta aqui" class="typing-input" required />
-                <button id="send-message-button" icon material-symbols-rounded>Enviar</button>
+    <div class="login-container">
+        <h2>Login</h2>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">username:</label>
+                <input type="username" id="username" name="username" required>
             </div>
-            <div class="action-buttons">
-                <span id="theme-toggle-button" class="icon material-symbols-rounded">light_mode</span>
-                <span id="delete-chat-button" class="icon material-symbols-rounded">delete</span>
+            <div class="input-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required>
             </div>
+            <button type="submit">Entrar</button>
+            <p>Não tem conta? <a href="register.html">Registre-se</a></p>
         </form>
+        <div id="loginMessage"></div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const loginForm = document.getElementById('loginForm');
+            loginForm.addEventListener('submit', async function(event) {
+                event.preventDefault(); // Impede o envio padrão do formulário
 
-    <script src="script.js"></script>
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                try {
+                    const response = await fetch('http://127.0.0.1:5000/login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log(data);
+                        window.location.href = 'dashboard.html'; // Redireciona para o dashboard
+                    } else {
+                        const errorData = await response.json();
+                        alert(errorData.message); // Exibe a mensagem de erro
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro inesperado, tente novamente mais tarde.');
+                }
+            });
+        });
+    </script>
+    </script>
+    
 </body>
-
 </html>
