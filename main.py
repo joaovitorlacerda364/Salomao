@@ -1,30 +1,39 @@
-import google.generativeai as genai
+﻿import google.generativeai as genai
 from flask import Flask, request, jsonify, session
 from flask_cors import CORS
 import sqlite3
 import bcrypt
 import time
 
+
 app = Flask(__name__)
 CORS(app)
 app.secret_key = 'Zzdtt09$$##@@~~'
 
+
 # Configure the API key for Google Generative AI
-genai.configure(api_key='YOUR_API_KEY')  # Replace with your API key
+genai.configure(api_key='AIzaSyBxd0joqcMIzaTJyTbDX7kvOkwzvrhDdhw')  # Replace with your API key
+
 
 # Function to connect to SQLite database
 def connect_db():
-    return sqlite3.connect('salomao2.db')
+    return sqlite3.connect('/tmp/salomao2.db')
+
+
+
 
 # Function to load the Bible text from a .txt file
 def load_bible(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
         return f.read()
 
+
 bible_text = load_bible('biblia.txt')
+
 
 def limit_text(text, limit=400000):
     return text[:limit] + "..." if len(text) > limit else text
+
 
 # Function to process user questions and generate responses
 def answer_question(question):
@@ -43,7 +52,9 @@ def answer_question(question):
             else:
                 return "Erro ao responder sua pergunta."
 
+
     return "Não consegui gerar uma resposta."
+
 
 # Create database tables
 def create_tables():
@@ -69,6 +80,7 @@ def create_tables():
         )
     ''')
 
+
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS user_chats (
             user_id INTEGER,
@@ -79,9 +91,11 @@ def create_tables():
         )
     ''')
 
+
     db.commit()
     cursor.close()
     db.close()
+
 
 # User registration route
 @app.route('/register', methods=['POST'])
@@ -90,20 +104,25 @@ def register():
     username = data.get('username')
     password = data.get('password')
 
+
     if not username or not password:
         return jsonify({'message': 'username e senha são obrigatórios.'}), 400
 
+
     db = connect_db()
     cursor = db.cursor()
+
 
     try:
         cursor.execute("SELECT user_id FROM users WHERE username = ?", (username,))
         if cursor.fetchone():
             return jsonify({'message': 'username já cadastrado.'}), 400
 
+
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, hashed_password))
         db.commit()
+
 
         return jsonify({'message': 'Usuário registrado com sucesso.'}), 201
     except Exception as e:
@@ -112,12 +131,14 @@ def register():
         cursor.close()
         db.close()
 
+
 # User login route
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
+
 
     if not username or not password:
         return jsonify({'message': 'username e senha são obrigatórios.'}), 400
@@ -133,6 +154,7 @@ def login():
         
     return jsonify({'message': 'username ou senha incorretos.'}), 401
 
+
 # User question route
 @app.route('/perguntar', methods=['POST'])
 def ask():
@@ -140,13 +162,16 @@ def ask():
     question = data.get('pergunta')
     user_id = session.get('user_id')
 
+
     if not question:
         return jsonify({'erro': 'Pergunta inválida.'}), 400
+
 
     answer = answer_question(question)
     
     db = connect_db()
     cursor = db.cursor()
+
 
     try:
         cursor.execute("INSERT INTO chats (user_id, pergunta, resposta) VALUES (?, ?, ?)", (user_id, question, answer))
@@ -159,24 +184,31 @@ def ask():
         cursor.close()
         db.close()
 
+
     return jsonify({'resposta': answer})
+
 
 # Route to get chat history
 @app.route('/historico', methods=['GET'])
 def history():
     user_id = session.get('user_id')
 
+
     db = connect_db()
     cursor = db.cursor()
     cursor.execute("SELECT pergunta, resposta, timestamp FROM chats WHERE user_id = ?", (user_id,))
     chats = cursor.fetchall()
 
+
     history = [{'pergunta': row[0], 'resposta': row[1], 'timestamp': row[2]} for row in chats]
+
 
     cursor.close()
     db.close()
 
+
     return jsonify(history)
+
 
 # Initialize database and server
 if __name__ == '__main__':
