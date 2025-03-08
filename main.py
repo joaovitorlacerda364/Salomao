@@ -12,7 +12,7 @@ app.secret_key = 'Zzdtt09$$##@@~~'
 
 
 # Configure the API key for Google Generative AI
-genai.configure(api_key='AIzaSyBxd0joqcMIzaTJyTbDX7kvOkwzvrhDdhw')  # Replace with your API key
+genai.configure(api_key='AIzaSyCb6jlIvPhTdvvxIV4KFlEpDLYLeOjwUpU')  # Replace with your API key
 
 
 # Function to connect to SQLite database
